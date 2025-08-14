@@ -12,7 +12,12 @@ performance by controlling data movement using the openMP API.
 
 ## Performance
 
-All performance tests were ran on EPCC's Grace-Hopper node using nvfortran v25.1
+All performance tests were ran on EPCC's Grace-Hopper node using nvfortran v25.1.
+Unless stated otherwise programs are built with
+```
+FFLAGS=-g -O3 -mp=gpu -Minfo=mp
+```
+as detailed in the `Makefile`.
 
 ### Naive implementation
 
@@ -36,6 +41,38 @@ download CUDA data  file=.../main.f90 function=main line=34 device=0 threadid=1 
  PASS
 93.92user 4.44system 1:39.31elapsed 99%CPU (0avgtext+0avgdata 7925760maxresident)k
 0inputs+0outputs (0major+162431minor)pagefaults 0swaps
+```
+
+### Adding map clauses
+
+In `main2` `map` clauses are used to control the movement of data to and from the GPU.
+As the timings show this reduces the runtime to ~40s, and it can be seen that
+the `nvomp` runtime reports smaller data movements as only the required data is
+up/downloaded.
+```
+$ NVCOMPILER_ACC_NOTIFY=3 OMP_TARGET_OFFLOAD=MANDATORY time ./main2
+upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=16 device=0 threadid=1 variable=a$sd1(:) bytes=128
+upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=16 device=0 threadid=1 variable=b$sd2(:) bytes=128
+upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=16 device=0 threadid=1 variable=descriptor bytes=128
+upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=16 device=0 threadid=1 variable=a(:) bytes=4000000000
+upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=16 device=0 threadid=1 variable=descriptor bytes=128
+launch CUDA kernel file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=16 device=0 host-threadid=0 num_teams=0 thread_limit=0 kernelname=nvkernel_MAIN__F1L16_2_ grid=<<<7812500,1,1>>> block=<<<128,1,1>>> shmem=0b
+download CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=20 device=0 threadid=1 variable=b(:) bytes=4000000000
+upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=23 device=0 threadid=1 variable=b$sd2(:) bytes=128
+upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=23 device=0 threadid=1 variable=descriptor bytes=128
+upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=23 device=0 threadid=1 variable=b(:) bytes=4000000000
+launch CUDA kernel file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=23 device=0 host-threadid=0 num_teams=0 thread_limit=0 kernelname=nvkernel_MAIN__F1L23_4_ grid=<<<7812500,1,1>>> block=<<<128,1,1>>> shmem=0b
+download CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=27 device=0 threadid=1 variable=b(:) bytes=4000000000
+upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=30 device=0 threadid=1 variable=a$sd1(:) bytes=128
+upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=30 device=0 threadid=1 variable=b$sd2(:) bytes=128
+upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=30 device=0 threadid=1 variable=descriptor bytes=128
+upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=30 device=0 threadid=1 variable=b(:) bytes=4000000000
+upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=30 device=0 threadid=1 variable=descriptor bytes=128
+launch CUDA kernel file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=30 device=0 host-threadid=0 num_teams=0 thread_limit=0 kernelname=nvkernel_MAIN__F1L30_6_ grid=<<<7812500,1,1>>> block=<<<128,1,1>>> shmem=0b
+download CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=34 device=0 threadid=1 variable=a(:) bytes=4000000000
+ PASS
+44.21user 4.76system 0:49.96elapsed 98%CPU (0avgtext+0avgdata 7925760maxresident)k
+0inputs+0outputs (0major+200171minor)pagefaults 0swaps
 ```
 
 ### Unified shared memory
