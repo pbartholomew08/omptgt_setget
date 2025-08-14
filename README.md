@@ -51,28 +51,54 @@ the `nvomp` runtime reports smaller data movements as only the required data is
 up/downloaded.
 ```
 $ NVCOMPILER_ACC_NOTIFY=3 OMP_TARGET_OFFLOAD=MANDATORY time ./main2
-upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=16 device=0 threadid=1 variable=a$sd1(:) bytes=128
-upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=16 device=0 threadid=1 variable=b$sd2(:) bytes=128
-upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=16 device=0 threadid=1 variable=descriptor bytes=128
-upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=16 device=0 threadid=1 variable=a(:) bytes=4000000000
-upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=16 device=0 threadid=1 variable=descriptor bytes=128
-launch CUDA kernel file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=16 device=0 host-threadid=0 num_teams=0 thread_limit=0 kernelname=nvkernel_MAIN__F1L16_2_ grid=<<<7812500,1,1>>> block=<<<128,1,1>>> shmem=0b
-download CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=20 device=0 threadid=1 variable=b(:) bytes=4000000000
-upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=23 device=0 threadid=1 variable=b$sd2(:) bytes=128
-upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=23 device=0 threadid=1 variable=descriptor bytes=128
-upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=23 device=0 threadid=1 variable=b(:) bytes=4000000000
-launch CUDA kernel file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=23 device=0 host-threadid=0 num_teams=0 thread_limit=0 kernelname=nvkernel_MAIN__F1L23_4_ grid=<<<7812500,1,1>>> block=<<<128,1,1>>> shmem=0b
-download CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=27 device=0 threadid=1 variable=b(:) bytes=4000000000
-upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=30 device=0 threadid=1 variable=a$sd1(:) bytes=128
-upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=30 device=0 threadid=1 variable=b$sd2(:) bytes=128
-upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=30 device=0 threadid=1 variable=descriptor bytes=128
-upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=30 device=0 threadid=1 variable=b(:) bytes=4000000000
-upload CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=30 device=0 threadid=1 variable=descriptor bytes=128
-launch CUDA kernel file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=30 device=0 host-threadid=0 num_teams=0 thread_limit=0 kernelname=nvkernel_MAIN__F1L30_6_ grid=<<<7812500,1,1>>> block=<<<128,1,1>>> shmem=0b
-download CUDA data  file=/home/ptbgh/src/omp/omptgt_setget/src/main2.f90 function=main line=34 device=0 threadid=1 variable=a(:) bytes=4000000000
+upload CUDA data  file=.../main2.f90 function=main line=16 device=0 threadid=1 variable=a$sd1(:) bytes=128
+upload CUDA data  file=.../main2.f90 function=main line=16 device=0 threadid=1 variable=b$sd2(:) bytes=128
+upload CUDA data  file=.../main2.f90 function=main line=16 device=0 threadid=1 variable=descriptor bytes=128
+upload CUDA data  file=.../main2.f90 function=main line=16 device=0 threadid=1 variable=a(:) bytes=4000000000
+upload CUDA data  file=.../main2.f90 function=main line=16 device=0 threadid=1 variable=descriptor bytes=128
+launch CUDA kernel file=.../main2.f90 function=main line=16 device=0 host-threadid=0 num_teams=0 thread_limit=0 kernelname=nvkernel_MAIN__F1L16_2_ grid=<<<7812500,1,1>>> block=<<<128,1,1>>> shmem=0b
+download CUDA data  file=.../main2.f90 function=main line=20 device=0 threadid=1 variable=b(:) bytes=4000000000
+upload CUDA data  file=.../main2.f90 function=main line=23 device=0 threadid=1 variable=b$sd2(:) bytes=128
+upload CUDA data  file=.../main2.f90 function=main line=23 device=0 threadid=1 variable=descriptor bytes=128
+upload CUDA data  file=.../main2.f90 function=main line=23 device=0 threadid=1 variable=b(:) bytes=4000000000
+launch CUDA kernel file=.../main2.f90 function=main line=23 device=0 host-threadid=0 num_teams=0 thread_limit=0 kernelname=nvkernel_MAIN__F1L23_4_ grid=<<<7812500,1,1>>> block=<<<128,1,1>>> shmem=0b
+download CUDA data  file=.../main2.f90 function=main line=27 device=0 threadid=1 variable=b(:) bytes=4000000000
+upload CUDA data  file=.../main2.f90 function=main line=30 device=0 threadid=1 variable=a$sd1(:) bytes=128
+upload CUDA data  file=.../main2.f90 function=main line=30 device=0 threadid=1 variable=b$sd2(:) bytes=128
+upload CUDA data  file=.../main2.f90 function=main line=30 device=0 threadid=1 variable=descriptor bytes=128
+upload CUDA data  file=.../main2.f90 function=main line=30 device=0 threadid=1 variable=b(:) bytes=4000000000
+upload CUDA data  file=.../main2.f90 function=main line=30 device=0 threadid=1 variable=descriptor bytes=128
+launch CUDA kernel file=.../main2.f90 function=main line=30 device=0 host-threadid=0 num_teams=0 thread_limit=0 kernelname=nvkernel_MAIN__F1L30_6_ grid=<<<7812500,1,1>>> block=<<<128,1,1>>> shmem=0b
+download CUDA data  file=.../main2.f90 function=main line=34 device=0 threadid=1 variable=a(:) bytes=4000000000
  PASS
 44.21user 4.76system 0:49.96elapsed 98%CPU (0avgtext+0avgdata 7925760maxresident)k
 0inputs+0outputs (0major+200171minor)pagefaults 0swaps
+```
+
+### Device resident data
+
+Operations on the working array `b` occur on device, by using `target
+enter/exit data map(alloc/delete:b)` it can be created on device and no
+transfers involving `b` are necessary.
+By applying this optimisation the significant host-device data movement is
+reduced to only up/downloading `a` and the runtime is now <1s.
+```
+$ NVCOMPILER_ACC_NOTIFY=3 OMP_TARGET_OFFLOAD=MANDATORY time ./main3
+upload CUDA data  file=.../main3.f90 function=main line=17 device=0 threadid=1 variable=descriptor bytes=128
+upload CUDA data  file=.../main3.f90 function=main line=17 device=0 threadid=1 variable=a$sd1(:) bytes=128
+upload CUDA data  file=.../main3.f90 function=main line=17 device=0 threadid=1 variable=descriptor bytes=128
+upload CUDA data  file=.../main3.f90 function=main line=17 device=0 threadid=1 variable=a(:) bytes=4000000000
+launch CUDA kernel file=.../main3.f90 function=main line=17 device=0 host-threadid=0 num_teams=0 thread_limit=0 kernelname=nvkernel_MAIN__F1L17_2_ grid=<<<7812500,1,1>>> block=<<<128,1,1>>> shmem=0b
+upload CUDA data  file=.../main3.f90 function=main line=24 device=0 threadid=1 variable=descriptor bytes=128
+launch CUDA kernel file=.../main3.f90 function=main line=24 device=0 host-threadid=0 num_teams=0 thread_limit=0 kernelname=nvkernel_MAIN__F1L24_4_ grid=<<<7812500,1,1>>> block=<<<128,1,1>>> shmem=0b
+upload CUDA data  file=.../main3.f90 function=main line=31 device=0 threadid=1 variable=descriptor bytes=128
+upload CUDA data  file=.../main3.f90 function=main line=31 device=0 threadid=1 variable=a$sd1(:) bytes=128
+upload CUDA data  file=.../main3.f90 function=main line=31 device=0 threadid=1 variable=descriptor bytes=128
+launch CUDA kernel file=.../main3.f90 function=main line=31 device=0 host-threadid=0 num_teams=0 thread_limit=0 kernelname=nvkernel_MAIN__F1L31_6_ grid=<<<7812500,1,1>>> block=<<<128,1,1>>> shmem=0b
+download CUDA data  file=.../main3.f90 function=main line=35 device=0 threadid=1 variable=a(:) bytes=4000000000
+ PASS
+0.52user 3.86system 0:05.37elapsed 81%CPU (0avgtext+0avgdata 4027392maxresident)k
+0inputs+0outputs (0major+62607minor)pagefaults 0swaps
 ```
 
 ### Unified shared memory
