@@ -1,6 +1,9 @@
 FC=nvfortran
-FFLAGS=-g -O3 -mp=gpu
+FFLAGS=-g -O0 -mp=gpu
 FFLAGS+=-Minfo=mp
+
+#FC=gfortran
+#FFLAGS=-g -O3 -fopenmp
 
 all: main1 main1.usm main2 main3 main4
 
@@ -16,5 +19,6 @@ main2: src/main2.f90
 main3: src/main3.f90
 	$(FC) $(FFLAGS) $^ -o bin/$@
 
-main4: src/main4.f90
-	$(FC) $(FFLAGS) $^ -o bin/$@
+main4: src/four.f90 src/main4.f90
+	$(FC) $(FFLAGS) -c src/four.f90 -o bin/four.o
+	$(FC) $(FFLAGS) src/main4.f90 -o bin/$@ bin/four.o
