@@ -43,6 +43,19 @@ download CUDA data  file=.../main.f90 function=main line=34 device=0 threadid=1 
 0inputs+0outputs (0major+162431minor)pagefaults 0swaps
 ```
 
+The addition of timers around the host-device, kernel, and device-host regions
+reveals that the time is dominated by data movement costs:
+```
+$ OMP_TARGET_OFFLOAD=MANDATORY time ./bin/main1
+ PASS
+ TIMES (s):
+ - Host-Device:     54.18061709403992     
+ - Kernel:    0.1184039115905762     
+ - Device-Host:     50.47920107841492     
+101.83user 4.13system 1:46.94elapsed 99%CPU (0avgtext+0avgdata 7925760maxresident)k
+0inputs+0outputs (0major+159427minor)pagefaults 0swaps
+```
+
 ### Adding map clauses
 
 In `main2` `map` clauses are used to control the movement of data to and from the GPU.
@@ -75,6 +88,20 @@ download CUDA data  file=.../main2.f90 function=main line=34 device=0 threadid=1
 0inputs+0outputs (0major+200171minor)pagefaults 0swaps
 ```
 
+A breakdown of the timings shows that there is still a significant data
+transfer cost associated with running the kernel as `b` must be copied on and
+off the device
+```
+$ OMP_TARGET_OFFLOAD=MANDATORY time ./bin/main2
+ PASS
+ TIMES (s):
+ - Host-Device:     15.90019917488098     
+ - Kernel:     24.75345897674561     
+ - Device-Host:     25.95578479766846     
+62.93user 4.82system 1:08.79elapsed 98%CPU (0avgtext+0avgdata 7925760maxresident)k
+0inputs+0outputs (0major+176800minor)pagefaults 0swaps
+```
+
 ### Device resident data
 
 Operations on the working array `b` occur on device, by using `target
@@ -101,6 +128,22 @@ download CUDA data  file=.../main3.f90 function=main line=35 device=0 threadid=1
 0inputs+0outputs (0major+62607minor)pagefaults 0swaps
 ```
 
+Now that we are controlling the device memory we can see that the time is
+dominated by allocating the device memory with some overhead for data
+transfers, the kernel itself takes minimal time
+```
+$ OMP_TARGET_OFFLOAD=MANDATORY time ./bin/main3
+ PASS
+ TIMES (s):
+ - Alloc:     2.973485946655273     
+ - Host-Device:    0.2939069271087646     
+ - Kernel:    4.7280788421630859E-003
+ - Device-Host:    1.8191099166870117E-002
+ - Delete:    1.0013580322265625E-005
+0.53user 3.84system 0:05.30elapsed 82%CPU (0avgtext+0avgdata 4027392maxresident)k
+0inputs+0outputs (0major+62582minor)pagefaults 0swaps
+```
+
 ### Unified shared memory
 
 Returning to the naive implementation and enabling unified shared memory
@@ -114,4 +157,19 @@ launch CUDA kernel file=.../main1.f90 function=main line=30 device=0 host-thread
  PASS
 1.65user 3.34system 0:06.01elapsed 83%CPU (0avgtext+0avgdata 4027392maxresident)k
 0inputs+0outputs (1major+14943minor)pagefaults 0swaps
+```
+
+The breakdown of timers reveals that the data movement costs are significantly
+reduced relative to the non-unified memory version, the upfront cost of moving
+the shared memory to the device is comparable to the allocation costs in
+`main3`, the kernel runtime itself is almost identical.
+```
+$ OMP_TARGET_OFFLOAD=MANDATORY time ./bin/main1.usm 
+ PASS
+ TIMES (s):
+ - Host-Device:     1.017045974731445     
+ - Kernel:    4.7500133514404297E-003
+ - Device-Host:    4.7299861907958984E-003
+1.61user 3.34system 0:05.92elapsed 83%CPU (0avgtext+0avgdata 4027392maxresident)k
+0inputs+0outputs (0major+14939minor)pagefaults 0swaps
 ```
