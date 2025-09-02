@@ -1,5 +1,8 @@
 module m_four
 
+  use iso_c_binding, only: c_ptr, c_size_t, c_f_pointer, c_sizeof
+  use omp_lib, only: omp_target_alloc, omp_target_free, omp_get_default_device
+
   implicit none
 
   private
@@ -10,10 +13,12 @@ module m_four
     integer :: m
     real, dimension(:), pointer :: b
     real, dimension(:, :), pointer :: bptr
+    type(c_ptr), private :: devptr
+    integer, private :: devid
   contains
     procedure :: set, get
     procedure :: kernel
-    final :: destroy_container
+    !!! final :: destroy_container ! XXX: This seems to be triggered at inopportune times
   end type
 
   interface container_t
@@ -24,31 +29,26 @@ contains
 
   type(container_t) function init_container(n) result(c)
     integer, intent(in) :: n
+    integer(kind=c_size_t) :: nbytes
 
     c%n = n
     c%m = int(sqrt(real(n)))
-    allocate(c%b(n))
-    c%bptr(1:c%m, 1:c%m) => c%b(1:c%m*c%m)
-    !$omp target enter data map(alloc:c%b)
-    !$omp target enter data map(to:c%bptr)
+    nbytes = int(n, kind=c_size_t) * c_sizeof(0.0)
+
+    c%devid = omp_get_default_device()
+    c%devptr = omp_target_alloc(nbytes, c%devid)
+
+    call c_f_pointer(c%devptr, c%b, [n])
+    call c_f_pointer(c%devptr, c%bptr, [c%m, c%m])
 
   end function
 
   subroutine destroy_container(self)
     type(container_t) :: self
 
-    print *, "Destruction!"
-    if (associated(self%bptr)) then
-      !$omp target exit data map(delete:self%bptr)
-      nullify(self%bptr)
-    end if
-
-    if (associated(self%b)) then
-      print *, "Delete B"
-      !$omp target exit data map(delete:self%b)
-      deallocate(self%b)
-      nullify(self%b)
-    end if
+    call omp_target_free(self%devptr, self%devid)
+    nullify(self%bptr)
+    nullify(self%b)
 
   end subroutine
 
@@ -56,8 +56,9 @@ contains
     class(container_t) :: self
     real, dimension(:), intent(in) :: a
 
-    call set_(self%b, a, min(self%n, size(a)))
+    integer :: i
 
+    call set_(self%b, a, min(self%n, size(a)))
   end subroutine
 
   subroutine set_(b, a, n)
@@ -67,7 +68,7 @@ contains
 
     integer :: i
 
-    !$omp target teams distribute parallel do map(to:a)
+    !$omp target teams distribute parallel do map(to:a) has_device_addr(b)
     do i = 1, n
       b(i) = a(i)
     end do
@@ -79,6 +80,8 @@ contains
     real, dimension(:), intent(out) :: a
     class(container_t), intent(in) :: self
 
+    integer :: i
+
     call get_(a, self%b, self%n)
   end subroutine
 
@@ -89,7 +92,7 @@ contains
 
     integer :: i
 
-    !$omp target teams distribute parallel do map(from:a)
+    !$omp target teams distribute parallel do map(from:a) has_device_addr(b)
     do i = 1, n
       a(i) = b(i)
     end do
@@ -98,9 +101,9 @@ contains
 
   subroutine kernel(self)
     class(container_t) :: self
+    integer :: i, j
 
     call kernel_(self%m, self%bptr)
-
   end subroutine
 
   subroutine kernel_(m, ptr)
@@ -109,7 +112,7 @@ contains
 
     integer :: i, j
 
-    !$omp target teams distribute parallel do collapse(2)
+    !$omp target teams distribute parallel do collapse(2) has_device_addr(ptr)
     do i = 1, m
       do j = 1, m
         ptr(i, j) = 2 * ptr(i, j)

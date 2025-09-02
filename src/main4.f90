@@ -16,7 +16,6 @@ program main
   a(:) = 1.0
 
   ! Set
-  !call copy_1d(c, a)
   call c%set(a)
 
   ! ! Kernel
@@ -25,7 +24,6 @@ program main
   ! ! Get
   call c%get(a)
 
-  print *, minval(a), maxval(a)
   if (any(a(1:c%m*c%m) /= 2.0)) then
     error stop
   else
@@ -33,7 +31,5 @@ program main
   end if
 
   deallocate(a)
-
-  print *, "FIN!"
 
 end program
